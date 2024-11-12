@@ -9,17 +9,18 @@ export default function Home() {
   const [initialAsk, setInitialAsk] = useState(false);
   const [answers, setAnswers] = useState([]);
   const [correctAnswerIndex, setCorrectAnswerIndex] = useState("");
+  const [loading, setLoading] = useState(false)
 
-  const handleAskQuestion = () => {
-    const triviaQuestion = {
-      question: "Who won the FIFA World Cup in 2018?",
-      answers: ["Brazil", "Germany", "France", "Argentina"],
-      correct: 2,
-    };
+  const handleAskQuestion = async () => {
     setInitialAsk(true);
-    setQuestion(triviaQuestion.question);
-    setAnswers(triviaQuestion.answers);
-    setCorrectAnswerIndex(triviaQuestion.correct);
+    setLoading(true)
+    const response = await fetch("/api");
+    const { data } = await response.json()
+
+    setQuestion(data.question);
+    setAnswers(data.answers);
+    setCorrectAnswerIndex(data.correctIndex);
+    setLoading(false)
   };
 
   const handleAnswerClick = (answer) => {
@@ -54,9 +55,13 @@ export default function Home() {
               </button>
             ))}
           </div>
-          <div className="text-center font-semibold text-indigo-600 text-sm mt-8">
-            <button onClick={handleAskQuestion}>Get a new question</button>
-          </div>
+          {loading ? (            
+            <div class="h-8 w-8 mt-8 animate-spin mx-auto rounded-full border-b-2 border-current" />
+          ) : (
+            <div className="text-center font-semibold text-indigo-600 text-sm mt-8">
+              <button onClick={handleAskQuestion}>Get a new question</button>
+            </div>
+          )}
         </div>
       )}
       <ToastContainer 
